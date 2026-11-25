@@ -1,0 +1,16 @@
+# Face Attendance — Project Dependencies
+
+# Computer Vision & Numerical Computing
+numpy>=2.0.0
+opencv-python>=4.10.0
+
+# Deep Learning & FaceNet
+torch>=2.15.0
+torchvision>=0.29.0
+pillow>=10.0.0
+requests>=2.30.0
+tqdm>=4.65.0
+facenet-pytorch>=2.6.0
+
+# Testing
+pytest>=8.0.0

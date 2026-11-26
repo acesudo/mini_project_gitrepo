@@ -130,6 +130,7 @@ feature.
 - [Attendance Workflow](docs/attendance_workflow.md)
 - [Database Design](docs/database.md)
 - [GitHub Development Workflow](docs/github_workflow.md)
+- [Backend API — Module 7](module7/README.md)
 
 ## GitHub Board
 

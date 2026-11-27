@@ -7,10 +7,13 @@ with an isolated in-memory database.
 """
 
 import os
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from module5.face_matcher import FaceMatcher
 from module6.attendance_manager import AttendanceManager
@@ -66,4 +69,14 @@ def create_app(
     app.include_router(students.router)
     app.include_router(recognition.router)
     app.include_router(attendance.router)
+
+    # Mount Module 8 Dashboard static files if directory exists
+    dashboard_dir = Path(__file__).resolve().parent.parent / "module8" / "static"
+    if dashboard_dir.is_dir():
+        app.mount("/dashboard", StaticFiles(directory=str(dashboard_dir), html=True), name="dashboard")
+
+        @app.get("/", include_in_schema=False)
+        def root_redirect():
+            return RedirectResponse(url="/dashboard/")
+
     return app

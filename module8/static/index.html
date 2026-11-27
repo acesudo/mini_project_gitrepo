@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Attendance — AI Attendance System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon">📸</div>
+      <div>
+        <div class="brand-title">Face Attendance</div>
+        <div class="brand-subtitle">AI-Powered Face Recognition Attendance System</div>
+      </div>
+    </div>
+    <div id="serverStatus" class="server-status">
+      <span class="status-dot"></span>
+      <span id="serverStatusText">Connecting...</span>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-nav">
+    <button class="tab-btn active" data-tab="kiosk">📷 Live Attendance Kiosk</button>
+    <button class="tab-btn" data-tab="today">📋 Today's Attendance</button>
+    <button class="tab-btn" data-tab="directory">👥 Student Directory</button>
+    <button class="tab-btn" data-tab="enroll">➕ Enroll Student</button>
+    <button class="tab-btn" data-tab="monthly">📊 Monthly Analytics</button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- KPI Metric Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Total Enrolled</span>
+        <span id="kpiTotalStudents" class="kpi-value">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Present Today</span>
+        <span id="kpiPresentToday" class="kpi-value" style="color: var(--success);">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Absent Today</span>
+        <span id="kpiAbsentToday" class="kpi-value" style="color: var(--danger);">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Attendance Rate</span>
+        <span id="kpiRate" class="kpi-value accent">0%</span>
+      </div>
+    </section>
+
+    <!-- Tab 1: Live Attendance Kiosk -->
+    <section id="tab-kiosk" class="tab-panel active">
+      <div class="kiosk-grid">
+        <!-- Camera Stream Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Live Camera Stream</h2>
+            <span id="scanIndicator" class="badge badge-warning" style="display: none;">Scanning...</span>
+          </div>
+
+          <div class="camera-container">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <canvas id="overlayCanvas"></canvas>
+            <div id="cameraPlaceholder" class="camera-placeholder">
+              <p style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</p>
+              <p>Camera is currently turned off.</p>
+              <button id="btnStartCamera" class="btn btn-primary" style="margin-top: 1rem;">Start Camera</button>
+            </div>
+          </div>
+
+          <div class="camera-controls">
+            <button id="btnToggleCamera" class="btn btn-secondary">Stop Camera</button>
+            <button id="btnScanOnce" class="btn btn-primary" disabled>Scan Once</button>
+            <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+              <input type="checkbox" id="chkAutoScan" checked>
+              Auto-scan every 2s
+            </label>
+          </div>
+        </div>
+
+        <!-- Real-Time Recognition Log Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Detections</h2>
+            <button id="btnClearLog" class="btn btn-secondary btn-sm">Clear</button>
+          </div>
+          <div id="liveDetectionLog" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">No faces detected yet. Turn on the camera to begin marking attendance.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Today's Attendance -->
+    <section id="tab-today" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Today's Attendance Log</h2>
+          <div class="filter-bar">
+            <input type="date" id="filterDate" class="form-control">
+            <select id="filterDeptToday" class="form-control">
+              <option value="">All Departments</option>
+            </select>
+            <input type="text" id="searchToday" class="form-control" placeholder="Search by name or ID...">
+            <button id="btnExportTodayCSV" class="btn btn-secondary btn-sm">📥 Export CSV</button>
+            <button id="btnPrintToday" class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Print</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Time Marked</th>
+                <th>Status</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="todayTableBody">
+              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading attendance records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Student Directory -->
+    <section id="tab-directory" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Enrolled Students Directory</h2>
+          <div class="filter-bar">
+            <select id="filterDeptDirectory" class="form-control">
+              <option value="">All Departments</option>
+            </select>
+            <input type="text" id="searchDirectory" class="form-control" placeholder="Search students...">
+            <button class="btn btn-primary btn-sm" onclick="switchTab('enroll')">➕ New Student</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Biometric Status</th>
+                <th>Enrolled Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="directoryTableBody">
+              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading student directory...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Enroll Student & Faces -->
+    <section id="tab-enroll" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Student Registration & Facial Biometric Enrollment</h2>
+        </div>
+
+        <form id="enrollmentForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Student ID *</label>
+              <input type="text" id="enrollStudentId" class="form-control" placeholder="e.g. CSE1025" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" id="enrollName" class="form-control" placeholder="e.g. Kunal Tiwari" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Department *</label>
+              <input type="text" id="enrollDept" class="form-control" placeholder="e.g. Computer Science" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Semester (1–12) *</label>
+              <input type="number" id="enrollSemester" class="form-control" min="1" max="12" value="3" required>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1rem; margin: 1rem 0 0.5rem;">Face Sample Capture (Minimum 3 samples required; 5 recommended)</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Look at the camera with varying angles (frontal, slight left, slight right, smiling) and good lighting.
+          </p>
+
+          <div style="display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap;">
+            <div style="width: 260px; height: 195px; background: #000; border-radius: 8px; overflow: hidden; position: relative;">
+              <video id="enrollVideo" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+            </div>
+            <div>
+              <button type="button" id="btnCaptureSample" class="btn btn-secondary">📸 Capture Sample (<span id="sampleCount">0</span>/5)</button>
+              <button type="button" id="btnResetSamples" class="btn btn-secondary btn-sm" style="margin-left: 0.5rem;">Reset Samples</button>
+              <div id="samplePreviews" class="sample-previews"></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+            <button type="submit" id="btnSubmitEnroll" class="btn btn-primary" style="padding: 0.75rem 2rem;">Save Student & Enroll Face</button>
+            <span id="enrollSpinner" style="display: none; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--primary);">
+              Processing FaceNet Embeddings...
+            </span>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Tab 5: Monthly Analytics & Reports -->
+    <section id="tab-monthly" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Monthly Attendance Summary & Reporting</h2>
+          <div class="filter-bar">
+            <select id="selectMonth" class="form-control"></select>
+            <select id="selectYear" class="form-control"></select>
+            <select id="filterDeptMonthly" class="form-control">
+              <option value="">All Departments</option>
+            </select>
+            <button id="btnFetchMonthly" class="btn btn-primary btn-sm">Generate Report</button>
+            <button id="btnExportMonthlyCSV" class="btn btn-secondary btn-sm">📥 Export CSV</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Total Active Days</th>
+                <th>Days Present</th>
+                <th>Attendance %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="monthlyTableBody">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Select month and click 'Generate Report'.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Student History Modal Dialog -->
+  <div id="historyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalStudentTitle" style="font-size: 1.15rem;">Student Attendance History</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeHistoryModal()">✕</button>
+      </div>
+      <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody id="modalHistoryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

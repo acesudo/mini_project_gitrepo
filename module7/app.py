@@ -19,6 +19,9 @@ from module5.face_matcher import FaceMatcher
 from module6.attendance_manager import AttendanceManager
 from module7.dependencies import AppState
 from module7.routers import attendance, health, recognition, students
+from module9.middleware import SecurityHeadersMiddleware
+from module9.router import router as auth_router
+from module9.user_manager import UserManager
 
 DESCRIPTION = """
 Backend for the **Face Attendance** system.
@@ -56,6 +59,16 @@ def create_app(
     state.reload_gallery()  # load registered faces from the database
     app.state.core = state
 
+    # Seed initial administrator account for Module 9
+    try:
+        with manager.get_session() as session:
+            UserManager(session).seed_initial_admin()
+    except Exception:
+        pass
+
+    # Security headers middleware (Module 9)
+    app.add_middleware(SecurityHeadersMiddleware)
+
     # Allow the Module 8 dashboard (served from another origin) to call this API.
     origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "*").split(",") if o.strip()]
     app.add_middleware(
@@ -69,6 +82,7 @@ def create_app(
     app.include_router(students.router)
     app.include_router(recognition.router)
     app.include_router(attendance.router)
+    app.include_router(auth_router)
 
     # Mount Module 8 Dashboard static files if directory exists
     dashboard_dir = Path(__file__).resolve().parent.parent / "module8" / "static"

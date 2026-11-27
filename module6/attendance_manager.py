@@ -21,6 +21,7 @@ if str(ROOT_DIR) not in sys.path:
 from module6.models import Student, Attendance
 from module6.database import get_db_session, init_db
 from module4.face_embedding import FaceEmbeddingGenerator
+import module9.models  # ensure User model is registered in Base.metadata
 
 
 class AttendanceManager:
@@ -31,6 +32,10 @@ class AttendanceManager:
     def __init__(self, engine=None) -> None:
         self.engine = engine
         init_db(self.engine)
+
+    def get_session(self):
+        """Context manager yielding a transactional database session."""
+        return get_db_session(self.engine)
 
     def mark_attendance(
         self,

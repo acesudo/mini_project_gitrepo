@@ -1,0 +1,384 @@
+{
+  "info": {
+    "name": "Face Attendance API (Module 7)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Start the server with: uvicorn module7.main:app --reload"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Create student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/students",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"CSE1025\",\n  \"name\": \"Kunal Tiwari\",\n  \"department\": \"Computer Science\",\n  \"semester\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Register with faces (pick 3+ photos)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/register-with-faces",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "register-with-faces"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "student_id",
+                  "value": "CSE1025",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Kunal Tiwari",
+                  "type": "text"
+                },
+                {
+                  "key": "department",
+                  "value": "Computer Science",
+                  "type": "text"
+                },
+                {
+                  "key": "semester",
+                  "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students?limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get student",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/CSE1025",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "CSE1025"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/students/CSE1025",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "CSE1025"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kunal Tiwari\",\n  \"department\": \"Computer Science\",\n  \"semester\": 4\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete student",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/CSE1025",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "CSE1025"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recognition",
+      "item": [
+        {
+          "name": "Recognize frame (pick a photo)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/recognition/frame",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "recognition",
+                "frame"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "mark_attendance",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Match raw embedding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recognition/embedding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "recognition",
+                "embedding"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"embedding\": [\n    \"<512 floats>\"\n  ],\n  \"mark_attendance\": false\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Today's attendance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attendance/daily",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "daily"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Attendance on a date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attendance/daily?date=2026-08-03",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "daily"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-08-03"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Student history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attendance/student/CSE1025",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "student",
+                "CSE1025"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Monthly summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attendance/monthly?year=2026&month=8",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "monthly"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                },
+                {
+                  "key": "month",
+                  "value": "8"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark attendance manually",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance/mark",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "mark"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"CSE1025\",\n  \"status\": \"Present\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
